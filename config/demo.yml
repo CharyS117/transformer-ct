@@ -1,0 +1,60 @@
+data:
+  image:
+    resolution: 512
+    from_bits: 12
+    to_bits: 8
+  train:
+  # training dataset options
+    path: ./dataset/train
+    io: ram
+    # the helper_name class in data.helper will be called
+    helper_name: Mayo
+    load_num: ~
+  val:
+  # validation dataset options
+    path: ./dataset/val
+    io: ram
+    helper_name: Mayo
+    load_num: ~
+
+net:
+  # the Net class in arch.model will be called
+  module: base
+  params:
+    # number of features to extract
+    features: 48
+    # number of Transformer blocks at different level
+    # length of blocks represents the depth of the net
+    blocks: [4,6,6,6,8]
+
+dataloader:
+  shuffle: true
+  pin_memory: true
+
+loss_fn:
+  class: torch.nn.MSELoss
+  params:
+    reduction: mean
+
+optimizer:
+  class: lion_pytorch.Lion
+  params:
+    lr: !!float 1e-4
+    weight_decay: !!float 1e-3
+
+train:
+  # enable automatic mixed precision training
+  enable_amp: true
+  # enable torch.compile()
+  compile: true
+  seed: 117
+  checkpoint_root: ./checkpoints
+  checkpoint_name: 2_stage_long_best.pth
+  checkpoint_interval: ~
+  loss_record_interval: 10
+  grad_clip_norm: 0.1
+  # stage of training
+  epoch: [120, 30]
+  batch: [16, 4]
+  size: [256, 512]
+  scheduler_eta_min: !!float 1e-7

@@ -1,0 +1,4 @@
+*.png
+*.log
+*.pth
+.DS_Store
